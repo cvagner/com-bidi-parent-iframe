@@ -19,3 +19,7 @@ docker run -it --rm --name test-server -p 8000:80 -v ${PWD}:/usr/share/nginx/htm
 ```
 
 Tester : http://parent-domain:8000/ivx_parent.html
+
+Exemple avec un message envoyé par chacune des parties :
+
+![](demo.png)
