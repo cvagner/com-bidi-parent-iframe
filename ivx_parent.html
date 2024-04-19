@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Test Comm. iframe parent / enfant</title>
+</head>
+<body>
+
+<h1>Conteneur</h1>
+<p><button id="msgbtn">Envoyer</button></p>
+<p>Reçu :</p>
+<div id="results"></div>
+<br/>
+
+<iframe src="http://iframe-domain:8000/ivx_iframe.html" id="aniframe" width="450px" height="200px"></iframe>
+
+<script>
+var iframeContentWindow = document.getElementById('aniframe').contentWindow;
+var messageButton = document.getElementById('msgbtn');
+var results = document.getElementById('results');
+
+// ***************************
+// * Communication to parent
+// ***************************
+function ivxBindEvent(element, eventName, eventHandler) {
+  if (element.addEventListener) {
+    // Pour IE8
+    element.addEventListener(eventName, eventHandler, false);
+  } else if (element.attachEvent) {
+    element.attachEvent('on' + eventName, eventHandler);
+  }
+}
+
+ivxBindEvent(window, 'message', function(evt) {
+    var parsedData = JSON.parse(evt.data);
+    results.innerHTML = evt.data;
+    console.log('Reçu de l\'iFrame : ', parsedData);
+});
+
+ivxBindEvent(window, 'message', function(evt) {
+    var parsedData = JSON.parse(evt.data);
+    results.innerHTML = evt.data;
+    console.log('Reçu de l\'iFrame (écouteur 2) : ', parsedData);
+});
+
+// ***************************
+// * Communication from parent
+// ***************************
+
+var ivxNotifyChild = function (msg) {
+  if (iframeContentWindow) {
+    iframeContentWindow.postMessage(msg, 'http://iframe-domain:8000');
+  }
+}
+
+ivxBindEvent(messageButton, 'click', function(e) {
+  ivxNotifyChild(JSON.stringify({rand: Math.random(), 'type': 'dsij'}));
+});
+</script>
+</body>
+</html>

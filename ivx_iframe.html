@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="background-color:#D53C2F;color:white;">
+
+  <h1>iFrame</h1>
+  <p><button id="msgbtn">Envoyer</button></p>
+  <p>Reçu :</p>
+  <div id="results"></div>
+
+<script>
+var results = document.getElementById('results');
+var messageButton = document.getElementById('msgbtn');
+
+// ***************************
+// * Communication to parent
+// ***************************
+var ivxNotifyParent = function(msg) {
+  if (window.parent) {
+    window.parent.postMessage(msg, 'http://parent-domain:8000');
+  }
+}
+
+// Sur clic
+ivxBindEvent(messageButton, 'click', function (e) {
+  ivxNotifyParent(JSON.stringify({rand: Math.random(), 'type': 'hjui'}));
+});
+
+// ***************************
+// * Communication from parent
+// ***************************
+function ivxBindEvent(element, eventName, eventHandler) {
+  if (element.addEventListener) {
+    // Pour IE8
+    element.addEventListener(eventName, eventHandler, false);
+  } else if (element.attachEvent) {
+    element.attachEvent('on' + eventName, eventHandler);
+  }
+}
+
+// Ecoute des messages du parent
+if (window.parent) {
+  ivxBindEvent(window, 'message', function(evt) {
+    var parsedData = JSON.parse(evt.data);
+    results.innerHTML = evt.data;
+    console.log('Reçu du parent : ', parsedData);
+  });
+}
+
+// Second écouteur
+if (window.parent) {
+  ivxBindEvent(window, 'message', function(evt) {
+    var parsedData = JSON.parse(evt.data);
+    console.log('Reçu du parent (écouteur 2) : ', parsedData);
+  });
+}
+
+</script>
+</body>
+</html>
